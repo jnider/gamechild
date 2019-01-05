@@ -1,0 +1,101 @@
+#/bin/bash
+
+# flags & variables
+TCHAIN="arm-none-eabi"
+OBJCOPY=$TCHAIN-objcopy
+CC=$TCHAIN-gcc
+OPT=2
+CFLAGS="-g -mcpu=cortex-m3 -mthumb -fno-builtin -I. -Wall -O$OPT"
+ASMFLAGS="-g -mcpu=cortex-m3 -mthumb -O$OPT -I. -x assembler-with-cpp"
+LDFLAGS="-nostartfiles -nostdlib -Tc_only_md_high_density.ld"
+
+# source files
+c_src=(main.c usart.c stdio.c)
+asm_src=(c_only_startup.s cortexm3_macro.s)
+
+# convert source file lists to object file lists
+c_objects=${c_src[@]/%.c/.o}
+asm_objects=${asm_src[@]/%.s/.o}
+objects=(${asm_objects[@]} ${c_objects[@]})
+
+# dependencies
+main_o=(main.c stdio.h hardware.h)
+hardware_o=(hardware.c hardware.h)
+usart_o=(usart.c usart.h)
+stdio_o=(stdio.c stdio.h usart.h hardware.h)
+
+# targets
+gamechild_elf=${objects[@]}
+gamechild_bin=(gamechild.elf)
+main=gamechild.bin
+
+# Create final output file (.bin) from ELF output file.
+function rule_bin()
+{
+   local target=$1
+   root=${target%%.bin} # pull the '.bin' off the end
+   suffix=${target##$root} # now pull the $root off the front
+   
+   # make sure the suffix really is '.bin'
+   [ "$suffix" == ".bin" ] || return -1
+   
+   echo "Creating bin file"
+   cmd="$OBJCOPY -O binary $root.elf $root.bin"
+   echo $cmd
+   $cmd
+}
+
+# Link: create ELF output file from object files
+function rule_elf()
+{
+   local target=$1
+   root=${target%%.elf}
+   suffix=${target##$root} # now pull the $root off the front
+   
+   [ "$suffix" == ".elf" ] || return -1
+
+   echo "Linking $target"
+   cmd="$CC $CFLAGS ${objects[@]} --output $target $LDFLAGS"
+   echo $cmd
+   $cmd
+}
+
+# compile .c file to .o file
+function rule_compile()
+{
+   local target=$1
+   root=${target%%.o}
+   suffix=${target##$root}
+   [ "$suffix" == ".o" ] && [ -f "$root.c" ] || return -1
+
+   echo "Compiling $root.c to $root.o"
+   cmd="$CC -c $CFLAGS $root.c -o $root.o"
+   echo $cmd
+   $cmd
+}
+
+# assemble .s file to .o file
+function rule_assemble()
+{
+   local target=$1
+   root=${target%%.o}
+   suffix=${target##$root}
+   [ "$suffix" == ".o" ] && [ -f "$root.s" ] || return -1
+
+   echo "Assembling $root.s to $root.o"
+   cmd="$CC -c $ASMFLAGS $root.s -o $root.o"
+   echo $cmd
+   $cmd
+}
+
+# delete all resulting files
+function rule_clean()
+{
+   local target=$1
+   [ "$target" == "clean" ] || return -1
+
+   echo "Cleaning output directory $dest_path"
+   cmd="rm -rf ${objects[@]} gamechild.bin gamechild.elf"
+   echo $cmd
+   $cmd
+}
