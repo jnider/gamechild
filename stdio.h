@@ -4,7 +4,7 @@
 void stdio_init(void);
 void stdio_shutdown(void);
 
-int printf(const char* msg);
+int printf(const char* format, ...);
 
 
 #endif // _STDIO__H

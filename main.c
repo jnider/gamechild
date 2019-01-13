@@ -2,6 +2,7 @@
 #include "clock.h"
 #include "timer.h"
 #include "gpio.h"
+#include "system.h"
 #include "stdio.h"
 
 #define BLINK_RATE 0x200000
@@ -52,7 +53,8 @@ void board_init(void)
 
 int main(void)
 {
-   int i;
+   u16 part;
+   u8 impl, var, rev;
 
    board_init();
    stdio_init();
@@ -62,14 +64,11 @@ int main(void)
 
    gpio_bit(2, 13, 0);
 
-   for (i=0; i < 10; i++)
-   {
-      if (printf(message))
-      {
-         gpio_bit(2, 13, 1);
-         break;
-      }
-   }
+   printf("STF103 initialized\r\n");
+
+   SCB_ReadCPUID(&impl, &var, &part, &rev);
+   printf("CPUID: impl=%i var=%i part=%i rev=%i\n",
+      (int)impl, (int)var, (int)part, (int)rev);
 
    stdio_shutdown();
 
