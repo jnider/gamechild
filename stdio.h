@@ -3,6 +3,7 @@
 
 void stdio_init(void);
 void stdio_shutdown(void);
+int stdio_getchar(void);
 
 int printf(const char* format, ...);
 

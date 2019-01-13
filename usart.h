@@ -12,6 +12,8 @@ typedef enum usart_stop_bits
    USART_STOP_BITS_1_5, /* 1.5 stop bits */
 } usart_stop_bits;
 
+//typedef void (*usart_recv_func)(u16 data);
+
 struct usart
 {
    u32 base;
@@ -32,5 +34,6 @@ void usart_set_stop_bits(struct usart *u, enum usart_stop_bits sb);
 void usart_set_baud_rate(struct usart *u, u32 bitrate);
 int usart_tx(struct usart *u, u8 data);
 void usart_tx_stop(struct usart *u);
+int usart_rx_data(struct usart *u);
 
 #endif // _USART__H

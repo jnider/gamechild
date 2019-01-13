@@ -80,16 +80,15 @@ void usart_init(struct usart *u, u32 base)
 {
    u->base = base;
 
-   // we want 115200-8N1 in case it's not clear
-
    // clear CTS and RTS bits
    pRegs->CR3 &= ~(CR3_CTSE | CR3_RTSE);
  
+   // we want 115200-8N1 in case it's not clear
    usart_set_stop_bits(u, 1);
    usart_set_baud_rate(u, 115200);
 
    // enable tx and rx channels, and interrupts
-   pRegs->CR1 |= CR1_TE | CR1_RE;// | CR1_PEIE | CR1_TXEIE | CR1_TCIE;
+   pRegs->CR1 |= CR1_TE | CR1_RE | CR1_RXNEIE; //CR1_PEIE | CR1_TXEIE | CR1_TCIE;
 
    // everything is ready - enable the USART
    pRegs->CR1 |= CR1_UE;
@@ -99,7 +98,6 @@ void usart_set_stop_bits(struct usart *u, enum usart_stop_bits sb)
 {
    u32 temp = pRegs->CR2 & ~CR2_STOP(3);
    pRegs->CR2 = temp | CR2_STOP(sb);
-   //SET_REG(base + USART_CR2, CR2_STOP(sb));
 }
 
 void usart_set_baud_rate(struct usart *u, u32 bitrate)
@@ -149,6 +147,16 @@ int usart_tx(struct usart *u, const u8 data)
       return -12;
 
    return 0;
+}
+
+int usart_rx_data(struct usart *u)
+{
+   // make sure there is data to read
+   if (!(pRegs->SR & SR_RXNE))
+      return -1;
+
+   // reading the data will automatically clear the RXNE
+   return (pRegs->DR & 0xFF);
 }
 
 void usart_tx_stop(struct usart *u)

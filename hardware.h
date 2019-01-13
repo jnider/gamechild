@@ -3,25 +3,27 @@
 
 #include "stm32f10x_type.h"
 
+/*
+See http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
+*/
+
 #define USER_CODE_FLASH0X8002000    ((u32)0x08002000)
 #define RAM_END                     ((u32)0x20005000)
 
-/*
-    These defineds are use to setup the hardware of the GPIO.
-    See http://www.st.com/web/en/resource/technical/document/reference_manual/CD00171190.pdf
-*/
-
-// Use Boot1 PB2 as the button, as hardly anyone uses this pin as GPIO
-// Need to set the button input mode to just CR_INPUT and not CR_INPUT_PU_PD because the external pullup on the jumplink is very weak
-	#define BUTTON_INPUT_MODE 	CR_INPUT
-    #define BUTTON_BANK GPIOB
-    #define BUTTON_PIN 2
-    #define BUTTON_PRESSED_STATE 1
+/* Core Peripheral Base Addresses - CD00228163.pdf */
+#define SYSTIMER_BASE   (0xE000E010)
+#define NVIC_BASE       (0xE000E100)
+#define SCB_BASE        (0xE000ED00)
+#define MPU_BASE        (0xE000ED90)
+#define NVIC2_BASE      (0xE000EF00)
 
 /* Peripheral Base Addresses */
+#define USB_BASE     (0x40005C00)
+#define USB_SRAM_BASE (0x40006000)
 #define AFIO_BASE    (0x40010000)
 #define GPIO_BASE    (0x40010800)
 #define TIM1_BASE    (0x40012C00)
+#define SPI1_BASE    (0x40013000)
 #define USART1_BASE  (0x40013800) /* USART low speed serial */
 #define RCC_BASE     (0x40021000) /* Reset and clock control */
 #define FLASH_BASE   (0x40022000) /* Flash memory interface */
@@ -55,26 +57,10 @@ struct FLASH_regs
 #define FLASH_RDPRT    0x00A5
 #define FLASH_SR_BSY   0x01
 
-#define GPIO_CR(port,pin) (port + (0x04*(pin>7)))
-
-#define CR_OUTPUT_OD        0x05
-#define CR_OUTPUT_PP        0x01
-#define CR_INPUT            0x04
-#define CR_INPUT_PU_PD      0x08
-
-#define NVIC_BASE  (SCS_BASE + 0x0100)
-#define SCB_BASE   (SCS_BASE + 0x0D00)
-#define STK        (SCS_BASE+0x10)
+#define STK_BASE   (SCS_BASE+0x10)
 #define SCB_VTOR   (SCB_BASE+0x08)
 #define STK_CTRL   (STK_BASE+0x00)
 
-#define TIM1_APB2_ENB ((u32)0x00000800)
-#define TIM1_PSC      (TIM1+0x28)
-#define TIM1_ARR      (TIM1+0x2C)
-#define TIM1_RCR      (TIM1+0x30)
-#define TIM1_CR1      (TIM1+0x00)
-#define TIM1_CR2      (TIM1+0x04)
-#define TIM1_DIER     (TIM1+0x0C)
 #define TIM1_UP_IRQ_Channel ((u8)0x19)
 
 #define USB_HP_IRQ  ((u8)0x13)
@@ -85,11 +71,6 @@ struct FLASH_regs
 /* AIRCR  */
 #define AIRCR_RESET         0x05FA0000
 #define AIRCR_RESET_REQ     (AIRCR_RESET | (u32)0x04);
-
-/* temporary copyage of example from kiel */
-#define __VAL(__TIMCLK, __PERIOD) ((__TIMCLK/1000000UL)*__PERIOD)
-#define __PSC(__TIMCLK, __PERIOD)  (((__VAL(__TIMCLK, __PERIOD)+49999UL)/50000UL) - 1)
-#define __ARR(__TIMCLK, __PERIOD) ((__VAL(__TIMCLK, __PERIOD)/(__PSC(__TIMCLK, __PERIOD)+1)) - 1)
 
 // SWD and JTAG DEBUGGING
 #define AFIO_MAPR_SWJ_CFG                      (0x7 << 24)

@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "gpio.h"
 #include "system.h"
+#include "nvic.h"
 #include "stdio.h"
 
 #define BLINK_RATE 0x200000
@@ -28,15 +29,6 @@ static void blink(u32 bank, u8 pin, u32 count, u32 on, u32 off)
     }
 }
 
-/*
-__inline static void stm32_NvicSetup (void) {
-
-  if (__NVIC_USED & (1 << 0)) {                              // Vector Table Offset Register
-    SCB->VTOR = (__NVIC_VTOR_VAL & (u32)0x3FFFFF80);         // set register
-  }
-} 
-*/
-
 void board_init(void)
 {
 
@@ -49,6 +41,17 @@ void board_init(void)
 
    // GPIOA pin 9 is USART1 Tx
    gpio_config_pin(0, 9, 1, 1, 1);
+
+   // enable IRQ for USART Rx/Tx
+   NVIC_enableInt(INT_VEC_USART1, 0);
+}
+
+void __attribute__((interrupt("IRQ"))) USART1_IRQHandler()
+{
+   gpio_bit(2, 13, 1);
+   int c = stdio_getchar();
+   printf("Got %i from USART\r\n", c);
+   gpio_bit(2, 13, 0);
 }
 
 int main(void)
@@ -67,8 +70,10 @@ int main(void)
    printf("STF103 initialized\r\n");
 
    SCB_ReadCPUID(&impl, &var, &part, &rev);
-   printf("CPUID: impl=%i var=%i part=%i rev=%i\n",
-      (int)impl, (int)var, (int)part, (int)rev);
+   printf("CPUID: impl=%i var=%i part=%i rev=%i\r\n", impl, var, part, rev);
+
+   // wait for an interrupt
+   while(1);
 
    stdio_shutdown();
 

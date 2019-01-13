@@ -52,13 +52,79 @@ struct RCC_regs
 #define RCC_CFGR_SW_HSE       (1<<0) /* System clock switch - HSE */
 #define RCC_CFGR_SW_PLL       (2<<0) /* System clock switch - PLL */
 
-   vu32 CIR;         /* Clock interrupt register 8.3.3 */
+   vu32 CIR;         /* Clock interrupt register 7.3.3 */
+#define RCC_CIR_CSSC          (1<<23) /* 'clear' bits */
+#define RCC_CIR_PLLRDYC       (1<<20)
+#define RCC_CIR_HSERDYC       (1<<19)
+#define RCC_CIR_HSIRDYC       (1<<18)
+#define RCC_CIR_LSERDYC       (1<<17)
+#define RCC_CIR_LSIRDYC       (1<<16)
+#define RCC_CIR_PLLRDYIE      (1<<12) /* 'interrupt enable' bits */
+#define RCC_CIR_HSERDYIE      (1<<11)
+#define RCC_CIR_HSIRDYIE      (1<<10)
+#define RCC_CIR_LSERDYIE      (1<<9)
+#define RCC_CIR_LSIRDYIE      (1<<8)
+#define RCC_CIR_CSSF          (1<<7) /* 'flag' bits */
+#define RCC_CIR_PLLRDYF       (1<<4)
+#define RCC_CIR_HSERDYF       (1<<3)
+#define RCC_CIR_HSIRDYF       (1<<2)
+#define RCC_CIR_LSERDYF       (1<<1)
+#define RCC_CIR_LSIRDYF       (1<<0)
+
    vu32 APB2RSTR;
+#define RCC_APB2RSTR_TIM11RST   (1<<21)
+#define RCC_APB2RSTR_TIM10RST   (1<<20)
+#define RCC_APB2RSTR_TIM9RST    (1<<19)
+#define RCC_APB2RSTR_ADC3RST    (1<<15)
 #define RCC_APB2RSTR_USART1RST  (1<<14)
+#define RCC_APB2RSTR_TIM8RST    (1<<13)
 #define RCC_APB2RSTR_SPI1RST    (1<<12)
+#define RCC_APB2RSTR_TIM1RST    (1<<11)
+#define RCC_APB2RSTR_ADC2RST    (1<<10)
+#define RCC_APB2RSTR_ADC1RST    (1<<9)
+#define RCC_APB2RSTR_IOPGRST    (1<<8)
+#define RCC_APB2RSTR_IOPFRST    (1<<7)
+#define RCC_APB2RSTR_IOPERST    (1<<6)
+#define RCC_APB2RSTR_IOPDRST    (1<<5)
+#define RCC_APB2RSTR_IOPCRST    (1<<4)
+#define RCC_APB2RSTR_IOPBRST    (1<<3)
+#define RCC_APB2RSTR_IOPARST    (1<<2)
+#define RCC_APB2RSTR_AFIORST    (1<<0)
 
    vu32 APB1RSTR;
+#define RCC_APB1RSTR_DACRST     (1<<29)
+#define RCC_APB1RSTR_PWRRST     (1<<28)
+#define RCC_APB1RSTR_BKPRST     (1<<27)
+#define RCC_APB1RSTR_CANRST     (1<<25)
+#define RCC_APB1RSTR_USBRST     (1<<23)
+#define RCC_APB1RSTR_I2C2RST    (1<<22)
+#define RCC_APB1RSTR_I2C1RST    (1<<21)
+#define RCC_APB1RSTR_UART5RST   (1<<20)
+#define RCC_APB1RSTR_UART4RST   (1<<19)
+#define RCC_APB1RSTR_UART3RST   (1<<18)
+#define RCC_APB1RSTR_UART2RST   (1<<17)
+#define RCC_APB1RSTR_SPI3RST    (1<<15)
+#define RCC_APB1RSTR_SPI2RST    (1<<14)
+#define RCC_APB1RSTR_WWDGRST    (1<<11)
+#define RCC_APB1RSTR_TIM14RST   (1<<8)
+#define RCC_APB1RSTR_TIM13RST   (1<<7)
+#define RCC_APB1RSTR_TIM12RST   (1<<6)
+#define RCC_APB1RSTR_TIM7RST    (1<<5)
+#define RCC_APB1RSTR_TIM6RST    (1<<4)
+#define RCC_APB1RSTR_TIM5RST    (1<<3)
+#define RCC_APB1RSTR_TIM4RST    (1<<2)
+#define RCC_APB1RSTR_TIM3RST    (1<<1)
+#define RCC_APB1RSTR_TIM2RST    (1<<0)
+
    vu32 AHBENR;
+#define RCC_AHBENR_SDIOEN        (1<<10)
+#define RCC_AHBENR_FSMCEN        (1<<8)
+#define RCC_AHBENR_CRCEN         (1<<6)
+#define RCC_AHBENR_FLITFEN       (1<<4)
+#define RCC_AHBENR_SRAMEN        (1<<2)
+#define RCC_AHBENR_DMA2EN        (1<<1)
+#define RCC_AHBENR_DMA1EN        (1<<0)
+
    vu32 APB2ENR;
 #define RCC_APB2ENR_TIM11EN   (1<<21)  /* TIM11 timer enable */
 #define RCC_APB2ENR_TIM10EN   (1<<20)  /* TIM10 timer enable */
@@ -80,12 +146,34 @@ struct RCC_regs
 #define RCC_APB2ENR_AFIOEN    (1<<0)
 
    vu32 APB1ENR;
-#define RCC_APB1ENR_USB_CLK   0x00800000 // The USB clock is the same for all boards
-#define RCC_APB1ENR_PWR_CLK   0x10000000 // Clocks for the backup domain registers
-#define RCC_APB1ENR_BKP_CLK   0x08000000
+#define RCC_APB1ENR_DACEN     (1<<29)
+#define RCC_APB1RSTR_PWREN    (1<<28)
+#define RCC_APB1RSTR_BKPEN    (1<<27)
+#define RCC_APB1RSTR_CANEN    (1<<25)
+#define RCC_APB1RSTR_USBEN    (1<<23)
+#define RCC_APB1RSTR_I2C2EN   (1<<22)
+#define RCC_APB1RSTR_I2C1EN   (1<<21)
+#define RCC_APB1RSTR_UART5EN  (1<<20)
+#define RCC_APB1RSTR_UART4EN  (1<<19)
+#define RCC_APB1RSTR_UART3EN  (1<<18)
+#define RCC_APB1RSTR_UART2EN  (1<<17)
+#define RCC_APB1RSTR_SPI3EN   (1<<15)
+#define RCC_APB1RSTR_SPI2EN   (1<<14)
+#define RCC_APB1RSTR_WWDGEN   (1<<11)
+#define RCC_APB1RSTR_TIM14EN  (1<<8)
+#define RCC_APB1RSTR_TIM13EN  (1<<7)
+#define RCC_APB1RSTR_TIM12EN  (1<<6)
+#define RCC_APB1RSTR_TIM7EN   (1<<5)
+#define RCC_APB1RSTR_TIM6EN   (1<<4)
+#define RCC_APB1RSTR_TIM5EN   (1<<3)
+#define RCC_APB1RSTR_TIM4EN   (1<<2)
+#define RCC_APB1RSTR_TIM3EN   (1<<1)
+#define RCC_APB1RSTR_TIM2EN   (1<<0)
 
    vu32 BDCR;
    vu32 CSR;
+#define RCC_CSR_LSIRDY        (1<<1)
+#define RCC_CSR_LSION         (1<<0)
 };
 #define pRCC ((struct RCC_regs*) RCC_BASE)
 
@@ -124,12 +212,12 @@ void setupPLL(void)
 void setupClocks(void)
 {
    // disable all RCC interrupts 
-   pRCC->CIR = 0;
+   pRCC->CIR &= ~(RCC_CIR_PLLRDYIE | RCC_CIR_HSERDYIE | RCC_CIR_HSIRDYIE | RCC_CIR_LSERDYIE | RCC_CIR_LSIRDYIE);
 
-   // enable USART1 & GPIO clocks
+   // enable USART1 & GPIO (A & C) clocks
    pRCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPCEN;
 
    // enable USB clock
-   pRCC->APB1ENR |= RCC_APB1ENR_USB_CLK;
+   //pRCC->APB1ENR |= RCC_APB1ENR_USB_CLK;
 }
 

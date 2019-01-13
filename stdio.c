@@ -5,6 +5,11 @@
 static struct usart serial1;
 static const char hex[]="0123456789ABCDEF";
 
+int stdio_getchar(void)
+{
+   return usart_rx_data(&serial1);
+}
+
 void stdio_init(void)
 {
    usart_init(&serial1, USART1_BASE);
