@@ -32,7 +32,7 @@ struct RCC_regs
 #define RCC_CFGR_PPRE2_X4     (0x5<<11)
 #define RCC_CFGR_PPRE2_X8     (0x6<<11)
 #define RCC_CFGR_PPRE2_X16    (0x7<<11)
-#define RCC_CFGR_PPRE1_MASK   (0x7<<8) /* APB1 high-speed prescaler */
+#define RCC_CFGR_PPRE1_MASK   (0x7<<8) /* APB1 low-speed peripheral bus prescaler */
 #define RCC_CFGR_PPRE1_X2     (0x4<<8)
 #define RCC_CFGR_PPRE1_X4     (0x5<<8)
 #define RCC_CFGR_PPRE1_X8     (0x6<<8)
@@ -147,28 +147,28 @@ struct RCC_regs
 
    vu32 APB1ENR;
 #define RCC_APB1ENR_DACEN     (1<<29)
-#define RCC_APB1RSTR_PWREN    (1<<28)
-#define RCC_APB1RSTR_BKPEN    (1<<27)
-#define RCC_APB1RSTR_CANEN    (1<<25)
-#define RCC_APB1RSTR_USBEN    (1<<23)
-#define RCC_APB1RSTR_I2C2EN   (1<<22)
-#define RCC_APB1RSTR_I2C1EN   (1<<21)
-#define RCC_APB1RSTR_UART5EN  (1<<20)
-#define RCC_APB1RSTR_UART4EN  (1<<19)
-#define RCC_APB1RSTR_UART3EN  (1<<18)
-#define RCC_APB1RSTR_UART2EN  (1<<17)
-#define RCC_APB1RSTR_SPI3EN   (1<<15)
-#define RCC_APB1RSTR_SPI2EN   (1<<14)
-#define RCC_APB1RSTR_WWDGEN   (1<<11)
-#define RCC_APB1RSTR_TIM14EN  (1<<8)
-#define RCC_APB1RSTR_TIM13EN  (1<<7)
-#define RCC_APB1RSTR_TIM12EN  (1<<6)
-#define RCC_APB1RSTR_TIM7EN   (1<<5)
-#define RCC_APB1RSTR_TIM6EN   (1<<4)
-#define RCC_APB1RSTR_TIM5EN   (1<<3)
-#define RCC_APB1RSTR_TIM4EN   (1<<2)
-#define RCC_APB1RSTR_TIM3EN   (1<<1)
-#define RCC_APB1RSTR_TIM2EN   (1<<0)
+#define RCC_APB1ENR_PWREN     (1<<28)
+#define RCC_APB1ENR_BKPEN     (1<<27)
+#define RCC_APB1ENR_CANEN     (1<<25)
+#define RCC_APB1ENR_USBEN     (1<<23)
+#define RCC_APB1ENR_I2C2EN    (1<<22)
+#define RCC_APB1ENR_I2C1EN    (1<<21)
+#define RCC_APB1ENR_UART5EN   (1<<20)
+#define RCC_APB1ENR_UART4EN   (1<<19)
+#define RCC_APB1ENR_UART3EN   (1<<18)
+#define RCC_APB1ENR_UART2EN   (1<<17)
+#define RCC_APB1ENR_SPI3EN    (1<<15)
+#define RCC_APB1ENR_SPI2EN    (1<<14)
+#define RCC_APB1ENR_WWDGEN    (1<<11)
+#define RCC_APB1ENR_TIM14EN   (1<<8)
+#define RCC_APB1ENR_TIM13EN   (1<<7)
+#define RCC_APB1ENR_TIM12EN   (1<<6)
+#define RCC_APB1ENR_TIM7EN    (1<<5)
+#define RCC_APB1ENR_TIM6EN    (1<<4)
+#define RCC_APB1ENR_TIM5EN    (1<<3)
+#define RCC_APB1ENR_TIM4EN    (1<<2)
+#define RCC_APB1ENR_TIM3EN    (1<<1)
+#define RCC_APB1ENR_TIM2EN    (1<<0)
 
    vu32 BDCR;
    vu32 CSR;
@@ -192,6 +192,7 @@ void setupPLL(void)
    pFLASH->ACR = FLASH_ACR_PRFTBE | FLASH_ACR_WAITSTATES(2);
 
    // set HSE as the source for the PLL, and multiply x9
+   // also set the prescaler for APB1 (low-speed peripheral bus) to 1/2
    pRCC->CFGR = RCC_CFGR_PLLSRC | RCC_CFGR_PLLMUL(9) | RCC_CFGR_PPRE1_X2;
    pRCC->CR |= RCC_CR_PLLON;
    while ((pRCC->CR & RCC_CR_PLLRDY) == 0);
@@ -201,8 +202,7 @@ void setupPLL(void)
    // [PPRE1]  APB1(PCLK1) <- HCLK
    // [PPRE2]  APB2(PCLK2) <- HCLK
    // [ADCPRE] ADC <- PCLK2
-   // [USBPRE] USB <- ?
-   //pRCC->CFGR &= ~(RCC_CFGR_USBPRE | RCC_CFGR_PPRE1_MASK | RCC_CFGR_PPRE2_MASK | RCC_CFGR_HPRE_MASK | RCC_CFGR_ADCPRE_MASK);
+   // [USBPRE] USB <- PLLCLK
 
    // select PLL as system clock source (SYSCLK)
    pRCC->CFGR |= RCC_CFGR_SW_PLL;
@@ -217,7 +217,7 @@ void setupClocks(void)
    // enable USART1 & GPIO (A & C) clocks
    pRCC->APB2ENR |= RCC_APB2ENR_USART1EN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPCEN;
 
-   // enable USB clock
-   //pRCC->APB1ENR |= RCC_APB1ENR_USB_CLK;
+   // enable low-speed peripheral clocks
+   pRCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 }
 

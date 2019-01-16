@@ -10,7 +10,7 @@ ASMFLAGS="-g -mcpu=cortex-m3 -mthumb -O$OPT -I. -x assembler-with-cpp"
 LDFLAGS="-nostartfiles -nostdlib -Tc_only_md_high_density.ld"
 
 # source files
-c_src=(main.c clock.c usart.c stdio.c gpio.c system.c nvic.c)
+c_src=(main.c clock.c usart.c stdio.c gpio.c system.c nvic.c timer.c)
 asm_src=(c_only_startup.s cortexm3_macro.s)
 
 # convert source file lists to object file lists
@@ -19,13 +19,15 @@ asm_objects=${asm_src[@]/%.s/.o}
 objects=(${asm_objects[@]} ${c_objects[@]})
 
 # dependencies
-main_o=(main.c stdio.h hardware.h system.h usart.h nvic.h)
+main_o=(main.c stdio.h hardware.h system.h usart.h nvic.h timer.h)
 hardware_o=(hardware.c hardware.h)
 usart_o=(usart.c usart.h)
 stdio_o=(stdio.c stdio.h usart.h hardware.h)
 timer_o=(timer.c timer.h hardware.h)
 system_o=(system.c hardware.h system.h)
 nvic_o=(nvic.c nvic.h hardware.h)
+timer_o=(timer.c timer.h hardware.h)
+clock_o=(clock.c clock.h hardware.h)
 
 # targets
 gamechild_elf=${objects[@]}

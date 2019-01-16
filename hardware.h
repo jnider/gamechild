@@ -18,13 +18,20 @@ See http://www.st.com/web/en/resource/technical/document/reference_manual/CD0017
 #define NVIC2_BASE      (0xE000EF00)
 
 /* Peripheral Base Addresses */
+#define TIM2_BASE    (0x40000000)
+#define TIM3_BASE    (0x40000400)
+#define TIM4_BASE    (0x40000800)
+#define TIM5_BASE    (0x40000C00)
 #define USB_BASE     (0x40005C00)
 #define USB_SRAM_BASE (0x40006000)
 #define AFIO_BASE    (0x40010000)
 #define GPIO_BASE    (0x40010800)
 #define TIM1_BASE    (0x40012C00)
 #define SPI1_BASE    (0x40013000)
+#define TIM8_BASE    (0x40013400)
 #define USART1_BASE  (0x40013800) /* USART low speed serial */
+#define TIM9_BASE    (0x40014C00)
+#define TIM10_BASE   (0x40015000)
 #define RCC_BASE     (0x40021000) /* Reset and clock control */
 #define FLASH_BASE   (0x40022000) /* Flash memory interface */
 #define SCS_BASE     (0xE000E000)

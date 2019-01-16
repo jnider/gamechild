@@ -26,11 +26,11 @@ typedef struct {
     bool NVIC_IRQChannelCmd; /* TRUE for enable */
 } NVIC_InitTypeDef;
 
-void NVIC_enableInt(int vecno, int priority)
+void NVIC_enableInt(int vecnum, int priority)
 {
     //pNVIC->IPR[(channel >> 0x02)] = 0;
 
-   pNVIC->ISER[(vecno >> 0x05)] = (u32)0x01 << (vecno & (u8)0x1F);
+   pNVIC->ISER[(vecnum >> 0x05)] = (u32)0x01 << (vecnum & (u8)0x1F);
    //pNVIC->ISER[0] = 0xFFFFFFFF;
    //pNVIC->ISER[1] = 0xFFFFFFFF;
 }
@@ -43,5 +43,15 @@ void NVIC_DisableInterrupts()
     pNVIC->ICPR[1] = 0xFFFFFFFF;
 
     //*STK_CTRL = 0x04; /* disable the systick, which operates separately from nvic */
+}
+
+void NVIC_setPending(int vecnum)
+{
+   pNVIC->ISPR[(vecnum >> 0x05)] = (u32)0x01 << (vecnum & (u8)0x1F);
+}
+
+void NVIC_clearPending(int vecnum)
+{
+   pNVIC->ICPR[(vecnum >> 0x05)] = (u32)0x01 << (vecnum & (u8)0x1F);
 }
 

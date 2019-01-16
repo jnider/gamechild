@@ -66,6 +66,8 @@ enum interrupt_vectors
 };
 
 void NVIC_DisableInterrupts();
-void NVIC_enableInt(int vecno, int priority);
+void NVIC_enableInt(int vecnum, int priority);
+void NVIC_setPending(int vecnum);
+void NVIC_clearPending(int vecnum);
 
 #endif // _NVIC__H
